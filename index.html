@@ -1,0 +1,367 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Family Display">
+<title>Family Display</title>
+<style>
+*{box-sizing:border-box} body{margin:0;background:#f5f6f7;color:#151515;font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif} button,input,select{font:inherit}.app{padding:18px 22px 30px;max-width:1400px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}.title{font-size:34px;font-weight:800}.sub{color:#6b7280;margin-top:6px}.actions{display:flex;gap:10px}.btn{border:1px solid #cfd4dc;background:white;border-radius:14px;padding:12px 18px;font-weight:700}.blue{background:#0b57d0;color:white;border:0}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.tab{border:1px solid #cfd4dc;background:#fff;border-radius:14px;padding:15px;font-size:19px;font-weight:700}.tab.active{background:#050505;color:#fff}
+.view{display:none}.view.active{display:block}.panel{background:#fff;border:1px solid #dfe3e8;border-radius:18px;padding:18px}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.group{display:flex;gap:8px;align-items:center}.range{font-size:22px;font-weight:700;margin-left:5px}
+.mode.active{background:#eef3fb;color:#1c5aa6}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.chip{border:0;background:#101114;color:#fff;border-radius:999px;padding:8px 12px;font-weight:700}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}
+.week{border:1px solid #dfe3e8;border-radius:14px;overflow:hidden;background:#fff}.weekhead{display:grid;grid-template-columns:68px repeat(7,1fr);border-bottom:1px solid #e5e7eb}.dh{text-align:center;padding:9px;border-left:1px solid #eceff3}.dn{font-size:12px;color:#6b7280}.num{font-size:22px;margin-top:3px}.today{display:inline-block;width:36px;height:36px;line-height:36px;border-radius:50%;background:#1264d4;color:white}
+.allday{display:grid;grid-template-columns:68px repeat(7,1fr);border-bottom:1px solid #e5e7eb}.alabel{padding:7px;font-size:12px;color:#6b7280;background:#fafafa}.acell{min-height:34px;padding:3px;border-left:1px solid #eceff3}.aitem,.mevent{font-size:11px;padding:4px 6px;margin-bottom:3px;border-left:4px solid;border-radius:4px;background:#f2f4f7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.weekbody{display:grid;grid-template-columns:68px repeat(7,1fr);height:600px;overflow:auto}.timecol{background:#fafafa}.tlabel{height:52px;border-bottom:1px solid #eceff3;text-align:right;padding:4px 7px;color:#6b7280;font-size:12px}.daycol{position:relative;border-left:1px solid #eceff3;background:repeating-linear-gradient(to bottom,#fff 0,#fff 51px,#eceff3 52px)}
+.event{position:absolute;left:4px;right:4px;border-left:5px solid;border-radius:6px;padding:5px 6px;font-size:12px;overflow:hidden}.event b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.month{display:grid;grid-template-columns:repeat(7,1fr);border:1px solid #dfe3e8;border-radius:14px;overflow:hidden}.mname{background:#fafafa;padding:9px;text-align:center;font-size:12px;color:#6b7280}.mcell{min-height:105px;padding:7px;border-top:1px solid #e7e9ee;border-right:1px solid #e7e9ee}.muted{background:#fafafa;color:#a0a5ad}
+.schedule{border:1px solid #dfe3e8;border-radius:14px;overflow:hidden}.sday{padding:16px;border-bottom:1px solid #e7e9ee}.sday h3{margin:0 0 8px}.srow{display:grid;grid-template-columns:105px 1fr auto;gap:12px;padding:9px 0;border-top:1px solid #f0f1f3}.bar{border-left:4px solid;padding-left:10px}
+.todoGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:#fff;border:1px solid #dfe3e8;border-radius:18px;min-height:450px;padding:18px}.chead{display:flex;justify-content:space-between;align-items:flex-start}.chead h2{margin:0}.plus{width:46px;height:46px;border:0;border-radius:13px;background:#0b57d0;color:#fff;font-size:26px}.meta{color:#6b7280;font-size:13px;margin-top:4px}
+.item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #eceff3}.check{width:28px;height:28px;border:2px solid #9aa1aa;border-radius:7px;background:white;flex:0 0 auto}.check.done{background:#4da7df;border-color:#4da7df;color:white}.ibody{flex:1}.ititle{font-size:18px;font-weight:700}.ititle.done{text-decoration:line-through;color:#7d8590}.del{border:0;background:transparent;color:#9a5d5d;font-size:20px}
+.shop{max-width:1050px;margin:auto}.shophead{display:flex;justify-content:space-between;align-items:flex-start}.shophead h2{margin:0;font-size:25px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);align-items:center;justify-content:center;padding:20px;z-index:20}.modal.show{display:flex}.box{background:#fff;border-radius:18px;padding:20px;width:100%;max-width:620px}.box h3{margin:0 0 14px}.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}input,select{width:100%;border:1px solid #cfd4dc;border-radius:11px;padding:11px 12px}.ma{display:flex;justify-content:flex-end;gap:9px;margin-top:16px}.empty{padding:22px;text-align:center;color:#7a818b}
+
+.keyboard{background:linear-gradient(180deg,#fffdf3,#fff9df);border:1px solid #eadfa7;border-radius:18px;padding:16px 18px;margin-bottom:16px}
+.keytop{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.keytop h2{margin:0;font-size:21px}
+.keyweek{color:#7a6a2d;font-size:13px;margin-top:4px}
+.keycards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.keycard{background:#fff;border:1px solid #eee4b6;border-radius:14px;padding:13px;text-align:center}
+.keycount{font-size:28px;font-weight:800;line-height:1}
+.keyname{font-size:13px;color:#71683f;margin-top:6px}
+.keyicon{font-size:24px;margin-right:4px}
+.settle{border:0;background:#b58b00;color:white;border-radius:12px;padding:10px 14px;font-weight:700}
+.settlement{display:none;background:#fff;border:1px solid #eadfa7;border-radius:14px;padding:12px 14px;margin-top:12px}
+.settlement.show{display:block}
+.settle-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f0ead0}
+.settle-row:last-child{border-bottom:0}
+
+
+.reward-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.reward-panel{background:#fff;border:1px solid #eadfa7;border-radius:14px;padding:14px}
+.reward-panel h3{margin:0 0 10px;font-size:18px}
+.reward-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.reward-tier{background:#fffaf0;border:1px solid #eadfa7;border-radius:12px;padding:10px;text-align:center}
+.reward-cost{font-size:20px;font-weight:800}
+.reward-name{font-size:13px;color:#6f6742;min-height:34px;margin:4px 0 8px}
+.reward-tier button{width:100%;border:0;background:#b58b00;color:#fff;border-radius:9px;padding:8px;font-weight:700}
+.extra-form{display:grid;grid-template-columns:1fr 90px auto;gap:8px}
+.reset-note{margin-top:8px;font-size:12px;color:#6b7280}
+.meal-panel{background:#fff;border:1px solid #dfe3e8;border-radius:18px;padding:18px}
+.meal-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.meal-head h2{margin:0;font-size:25px}
+.meal-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.meal-day{border:1px solid #dfe3e8;border-radius:14px;padding:12px;background:#fff}
+.meal-day h3{margin:0 0 10px;font-size:17px;text-align:center}
+.meal-day textarea{width:100%;height:220px;border:1px solid #d7dce3;border-radius:10px;padding:10px;font:inherit;resize:none}
+.recur-row{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.recur-help{grid-column:1/-1;color:#6b7280;font-size:12px}
+@media(max-width:900px){.reward-actions{grid-template-columns:1fr}.reward-tiers{grid-template-columns:1fr}.meal-grid{grid-template-columns:1fr 1fr}}
+
+@media(max-width:900px){.app{padding:14px}.todoGrid{grid-template-columns:1fr}.weekbody{height:520px}.title{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="app">
+ <div class="top"><div><div class="title">Family Display</div><div class="sub" id="saved">Saved locally</div></div><div class="actions"><button class="btn" onclick="renderAll()">Refresh</button><button class="btn" onclick="openSettings()">Settings</button></div></div>
+ <div class="tabs">
+  <button id="t-calendar" class="tab active" onclick="main('calendar')">📅 Calendar</button>
+  <button id="t-todo" class="tab" onclick="main('todo')">✓ To Do</button>
+  <button id="t-meal" class="tab" onclick="main('meal')">🍽 Meal Plan</button>
+ </div>
+ <section id="v-calendar" class="view active">
+  <div class="toolbar"><div class="group"><button class="btn" onclick="move(-1)">‹</button><button class="btn" onclick="today()">Today</button><button class="btn" onclick="move(1)">›</button><span class="range" id="range"></span></div>
+   <div class="group"><button id="m-week" class="btn mode active" onclick="mode('week')">Week</button><button id="m-month" class="btn mode" onclick="mode('month')">Month</button><button id="m-schedule" class="btn mode" onclick="mode('schedule')">Schedule</button><button class="btn blue" onclick="openEvent()">+ Event</button></div></div>
+  <div class="chips" id="chips"></div><div id="cal"></div>
+ </section>
+ <section id="v-todo" class="view">
+  <div class="keyboard">
+    <div class="keytop">
+      <div><h2>🔑 Gold Key Rewards</h2><div class="keyweek" id="keyWeek"></div></div>
+      <button class="settle" onclick="toggleSettlement()">Weekly Settlement</button>
+    </div>
+    <div class="keycards" id="keyCards"></div>
+
+    <div class="reward-actions">
+      <div class="reward-panel">
+        <h3>✨ Extra Reward</h3>
+        <div class="extra-form">
+          <select id="extraPerson"></select>
+          <input id="extraKeys" type="number" min="1" value="1">
+          <button class="btn blue" onclick="addExtraKeys()">+ Add 🔑</button>
+        </div>
+        <div class="reset-note">Use for extra effort, helping at home, special achievement, etc.</div>
+      </div>
+
+      <div class="reward-panel">
+        <h3>🎁 Redeem Rewards</h3>
+        <div class="reward-tiers">
+          <div class="reward-tier"><div class="reward-cost">10 🔑</div><div class="reward-name">奶茶</div><button onclick="redeemReward(10,'奶茶')">Redeem</button></div>
+          <div class="reward-tier"><div class="reward-cost">20 🔑</div><div class="reward-name">周末电影</div><button onclick="redeemReward(20,'周末电影')">Redeem</button></div>
+          <div class="reward-tier"><div class="reward-cost">30 🔑</div><div class="reward-name">自选小奖励</div><button onclick="redeemReward(30,'自选小奖励')">Redeem</button></div>
+        </div>
+        <div class="reset-note">兑换成功后，该成员本周可用钥匙自动 Reset 为 0。</div>
+      </div>
+    </div>
+
+    <div class="settlement" id="settlement"></div>
+  </div>
+  <div class="todoGrid" id="todos"></div>
+</section>
+ <section id="v-meal" class="view">
+  <div class="meal-panel">
+    <div class="meal-head">
+      <div><h2>Meal Plan</h2><div class="meta">Monday – Friday · saved automatically on this iPad</div></div>
+    </div>
+    <div class="meal-grid" id="mealGrid"></div>
+  </div>
+</section>
+</div>
+
+<div id="eventModal" class="modal"><div class="box"><h3>Add Calendar Event</h3>
+<div class="form">
+  <input class="full" id="eTitle" placeholder="Event title">
+  <input id="eDate" type="date">
+  <input id="eTime" type="time">
+  <input id="eEnd" type="time">
+  <select id="ePerson"></select>
+  <label class="full"><input id="eAll" type="checkbox" style="width:auto"> All day</label>
+  <div class="recur-row">
+    <select id="eRepeat" onchange="repeatChanged()">
+      <option value="none">Does not repeat</option>
+      <option value="weekly">Every week</option>
+      <option value="biweekly">Every 2 weeks</option>
+      <option value="monthly">Every month</option>
+    </select>
+    <input id="eRepeatUntil" type="date" disabled>
+  </div>
+  <div class="recur-help">For recurring events, choose a Repeat Until date.</div>
+</div>
+<div class="ma"><button class="btn" onclick="closeM('eventModal')">Cancel</button><button class="btn blue" onclick="saveEvent()">Save</button></div>
+</div></div>
+<div id="todoModal" class="modal"><div class="box"><h3>Add To Do</h3><div class="form"><input class="full" id="tdTitle" placeholder="Task"><select id="tdList"></select><input id="tdDue" type="date"></div><div class="ma"><button class="btn" onclick="closeM('todoModal')">Cancel</button><button class="btn blue" onclick="saveTodo()">Save</button></div></div></div>
+</div>
+<div id="settingsModal" class="modal"><div class="box"><h3>Settings</h3><div class="form"><input id="l1"><input id="l2"><input id="l3"><select id="start"><option value="7">Start 7 AM</option><option value="8">Start 8 AM</option><option value="9">Start 9 AM</option></select></div><p class="meta">Everything stays in Safari local storage. No Google Calendar connection.</p><div class="ma"><button class="btn" onclick="closeM('settingsModal')">Cancel</button><button class="btn blue" onclick="saveSettings()">Save</button></div></div></div>
+
+<script>
+var C={family:"#e15a8d",mom:"#6e63c6",dad:"#62a9d1",julie:"#6ec9b7",cynthia:"#e4845b"}, cfg=get("fd_settings",{lists:["Family","Julie","Cynthia"],startHour:8}), cm="week", anchor=new Date(), on={family:1,mom:1,dad:1,julie:1,cynthia:1};
+function E(i){return document.getElementById(i)} function get(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}} function put(k,v){localStorage.setItem(k,JSON.stringify(v));E("saved").innerHTML="Saved "+new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}
+function esc(s){return String(s||"").replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]})} function fd(d){return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)} function pd(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2],12)} function add(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x} function sow(d){return add(d,-d.getDay())} function same(a,b){return a.toDateString()==b.toDateString()} function mins(t){var p=t.split(":");return +p[0]*60 + +p[1]} function tm(t){if(!t)return"";var p=t.split(":"),d=new Date();d.setHours(+p[0],+p[1]);return d.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})}
+function name(i){return{family:"Family",mom:"Mom",dad:"Dad",julie:"Julie",cynthia:"Cynthia"}[i]||i} function rgba(h,a){h=h.replace("#","");return"rgba("+parseInt(h.substr(0,2),16)+","+parseInt(h.substr(2,2),16)+","+parseInt(h.substr(4,2),16)+","+a+")"}
+function main(n){["calendar","todo","meal"].forEach(function(x){E("v-"+x).className="view"+(x==n?" active":"");E("t-"+x).className="tab"+(x==n?" active":"")})} function showM(i){E(i).className="modal show"} function closeM(i){E(i).className="modal"}
+function chips(){var a=["family","mom","dad","julie","cynthia"],o="";a.forEach(function(i){o+='<button class="chip" style="opacity:'+(on[i]?1:.35)+'" onclick="toggleC(\''+i+'\')"><span class="dot" style="background:'+C[i]+'"></span>'+name(i)+'</button>'});E("chips").innerHTML=o} function toggleC(i){on[i]=!on[i];chips();renderCal()}
+function mode(m){cm=m;["week","month","schedule"].forEach(function(x){E("m-"+x).className="btn mode"+(x==m?" active":"")});renderCal()} function move(n){if(cm=="month")anchor.setMonth(anchor.getMonth()+n);else anchor=add(anchor,n*7);renderCal()} function today(){anchor=new Date();renderCal()}
+function events(){return get("family_events",[]).map(function(e){e.person=e.person||"family";if(e.allDay===undefined)e.allDay=!e.time;return e})}
+function openEvent(d){
+  E("eTitle").value="";
+  E("eDate").value=d||fd(new Date());
+  E("eTime").value="";
+  E("eEnd").value="";
+  E("eAll").checked=false;
+  E("eRepeat").value="none";
+  E("eRepeatUntil").value="";
+  E("eRepeatUntil").disabled=true;
+  E("ePerson").innerHTML=["family","mom","dad","julie","cynthia"].map(function(i){return'<option value="'+i+'">'+name(i)+'</option>'}).join("");
+  showM("eventModal")
+}
+function repeatChanged(){
+  var repeating=E("eRepeat").value!="none";
+  E("eRepeatUntil").disabled=!repeating;
+  if(repeating && !E("eRepeatUntil").value){
+    var d=pd(E("eDate").value||fd(new Date()));
+    E("eRepeatUntil").value=fd(add(d,84));
+  }
+}
+function addMonthSafe(d){
+  var day=d.getDate();
+  var x=new Date(d.getFullYear(),d.getMonth()+1,1,12);
+  var last=new Date(x.getFullYear(),x.getMonth()+1,0,12).getDate();
+  x.setDate(Math.min(day,last));
+  return x
+}
+function saveEvent(){
+  var t=E("eTitle").value.trim(),d=E("eDate").value;
+  if(!t||!d)return alert("Enter title and date");
+  var repeat=E("eRepeat").value,until=E("eRepeatUntil").value,a=events();
+  if(repeat!="none"&&!until)return alert("Choose Repeat Until date");
+
+  var sid=repeat=="none"?null:Date.now();
+  var base={title:t,time:E("eTime").value,endTime:E("eEnd").value,person:E("ePerson").value,allDay:E("eAll").checked,recurrence:repeat,seriesId:sid};
+
+  if(repeat=="none"){
+    a.push({id:Date.now(),title:base.title,date:d,time:base.time,endTime:base.endTime,person:base.person,allDay:base.allDay,recurrence:"none",seriesId:null});
+  }else{
+    var cur=pd(d),end=pd(until),count=0;
+    while(cur<=end && count<180){
+      a.push({id:Date.now()+count,title:base.title,date:fd(cur),time:base.time,endTime:base.endTime,person:base.person,allDay:base.allDay,recurrence:repeat,seriesId:sid});
+      if(repeat=="weekly")cur=add(cur,7);
+      else if(repeat=="biweekly")cur=add(cur,14);
+      else cur=addMonthSafe(cur);
+      count++;
+    }
+  }
+  put("family_events",a);closeM("eventModal");renderCal()
+}
+function delEvent(id){
+  var a=events(),target=null,i;
+  for(i=0;i<a.length;i++){if(a[i].id==id){target=a[i];break}}
+  if(!target)return;
+
+  if(target.seriesId){
+    var whole=confirm("Recurring event:\n\nOK = Delete the whole series\nCancel = Delete this occurrence only");
+    if(whole)put("family_events",a.filter(function(x){return x.seriesId!=target.seriesId}));
+    else put("family_events",a.filter(function(x){return x.id!=id}));
+  }else{
+    if(!confirm("Delete this event?"))return;
+    put("family_events",a.filter(function(x){return x.id!=id}));
+  }
+  renderCal()
+}
+function renderCal(){chips();if(cm=="week")week();else if(cm=="month")month();else schedule()}
+function week(){var s=sow(anchor),e=add(s,6),a=events(),now=new Date(),o='<div class="week"><div class="weekhead"><div></div>';E("range").innerHTML=s.toLocaleDateString([],{month:"short",day:"numeric"})+" – "+e.toLocaleDateString([],{month:"short",day:"numeric",year:"numeric"});for(var i=0;i<7;i++){var d=add(s,i);o+='<div class="dh"><div class="dn">'+d.toLocaleDateString([],{weekday:"short"})+'</div><div class="num '+(same(d,now)?"today":"")+'">'+d.getDate()+'</div></div>'}o+='</div><div class="allday"><div class="alabel">All day</div>';for(i=0;i<7;i++){d=add(s,i);var ds=fd(d);o+='<div class="acell">';a.filter(function(x){return x.date==ds&&(x.allDay||!x.time)&&on[x.person]}).forEach(function(x){o+='<div class="aitem" style="border-color:'+C[x.person]+'" onclick="delEvent('+x.id+')">'+esc(x.title)+'</div>'});o+='</div>'}o+='</div><div class="weekbody"><div class="timecol">';var sh=+cfg.startHour||8;for(var h=sh;h<=21;h++){var q=new Date();q.setHours(h,0);o+='<div class="tlabel">'+q.toLocaleTimeString([],{hour:"numeric"})+'</div>'}o+='</div>';for(i=0;i<7;i++){d=add(s,i);ds=fd(d);o+='<div class="daycol" ondblclick="openEvent(\''+ds+'\')">';a.filter(function(x){return x.date==ds&&x.time&&!x.allDay&&on[x.person]}).forEach(function(x){var st=mins(x.time),en=x.endTime?mins(x.endTime):st+60,top=(st-sh*60)/60*52,ht=Math.max(28,(en-st)/60*52);if(top<0)top=0;o+='<div class="event" onclick="delEvent('+x.id+')" style="top:'+top+'px;height:'+ht+'px;border-color:'+C[x.person]+';background:'+rgba(C[x.person],.15)+'"><b>'+esc(x.title)+'</b>'+tm(x.time)+'</div>'});o+='</div>'}E("cal").innerHTML=o+'</div></div>'}
+function month(){var y=anchor.getFullYear(),m=anchor.getMonth(),f=new Date(y,m,1),s=add(f,-f.getDay()),a=events(),o='<div class="month">';E("range").innerHTML=anchor.toLocaleDateString([],{month:"long",year:"numeric"});["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(function(x){o+='<div class="mname">'+x+'</div>'});for(var i=0;i<42;i++){var d=add(s,i),ds=fd(d);o+='<div class="mcell '+(d.getMonth()!=m?"muted":"")+'" ondblclick="openEvent(\''+ds+'\')"><b>'+d.getDate()+'</b>';a.filter(function(x){return x.date==ds&&on[x.person]}).slice(0,4).forEach(function(x){o+='<div class="mevent" style="border-color:'+C[x.person]+'" onclick="delEvent('+x.id+')">'+esc(x.title)+'</div>'});o+='</div>'}E("cal").innerHTML=o+'</div>'}
+function schedule(){var s=sow(anchor),e=add(s,13),a=events().filter(function(x){var d=pd(x.date);return d>=s&&d<=e&&on[x.person]}).sort(function(a,b){return(a.date+a.time).localeCompare(b.date+b.time)}),g={},o='<div class="schedule">';E("range").innerHTML="Schedule · "+anchor.toLocaleDateString([],{month:"long",year:"numeric"});a.forEach(function(x){(g[x.date]||(g[x.date]=[])).push(x)});Object.keys(g).sort().forEach(function(k){o+='<div class="sday"><h3>'+pd(k).toLocaleDateString([],{weekday:"long",month:"long",day:"numeric"})+'</h3>';g[k].forEach(function(x){o+='<div class="srow"><div>'+((x.allDay||!x.time)?"All day":tm(x.time))+'</div><div class="bar" style="border-color:'+C[x.person]+'"><b>'+esc(x.title)+'</b><div class="meta">'+name(x.person)+'</div></div><button class="del" onclick="delEvent('+x.id+')">×</button></div>'});o+='</div>'});if(!a.length)o+='<div class="empty">No events in the next two weeks.</div>';E("cal").innerHTML=o+'</div>'}
+function todos(){return get("family_todos",[])}
+function weekKey(ts){
+  var d=ts?new Date(ts):new Date(), s=new Date(d);
+  s.setHours(0,0,0,0); s.setDate(d.getDate()-d.getDay());
+  return fd(s)
+}
+function currentWeekRange(){
+  var s=sow(new Date()),e=add(s,6);
+  return s.toLocaleDateString([],{month:"short",day:"numeric"})+" – "+e.toLocaleDateString([],{month:"short",day:"numeric",year:"numeric"})
+}
+function rewardState(){return get("fd_reward_state",{extras:[],resets:{},history:[]})}
+function saveRewardState(s){put("fd_reward_state",s)}
+function rawTaskKeys(){
+  var wk=weekKey(),a=todos(),c=[0,0,0];
+  a.forEach(function(x){
+    if(x.done&&x.doneAt&&weekKey(x.doneAt)==wk){
+      var i=+(x.listIndex||0);if(i>=0&&i<3)c[i]++
+    }
+  });
+  return c
+}
+function rawExtraKeys(){
+  var wk=weekKey(),s=rewardState(),c=[0,0,0];
+  s.extras.forEach(function(x){if(x.week==wk&&x.listIndex>=0&&x.listIndex<3)c[x.listIndex]+=Number(x.amount||0)});
+  return c
+}
+function keyStats(){
+  var tasks=rawTaskKeys(),extras=rawExtraKeys(),s=rewardState(),wk=weekKey(),counts=[0,0,0],total=0,i;
+  for(i=0;i<3;i++){
+    var earned=tasks[i]+extras[i];
+    var reset=(s.resets[wk]&&s.resets[wk][i])?Number(s.resets[wk][i]):0;
+    counts[i]=Math.max(0,earned-reset);total+=counts[i]
+  }
+  return {counts:counts,total:total,tasks:tasks,extras:extras}
+}
+function renderKeys(){
+  var st=keyStats(),o="",i;
+  E("keyWeek").innerHTML="This week · "+currentWeekRange();
+  for(i=0;i<3;i++){
+    o+='<div class="keycard"><div class="keycount"><span class="keyicon">🔑</span>'+st.counts[i]+'</div><div class="keyname">'+esc(cfg.lists[i])+'</div><div class="meta">To-do '+st.tasks[i]+' + Extra '+st.extras[i]+'</div></div>';
+  }
+  o+='<div class="keycard"><div class="keycount"><span class="keyicon">🏆</span>'+st.total+'</div><div class="keyname">Family Total</div></div>';
+  E("keyCards").innerHTML=o;
+  E("extraPerson").innerHTML=cfg.lists.map(function(n,i){return'<option value="'+i+'">'+esc(n)+'</option>'}).join("");
+  renderSettlement();
+}
+function addExtraKeys(){
+  var i=Number(E("extraPerson").value),amount=Number(E("extraKeys").value);
+  if(!amount||amount<1)return;
+  var s=rewardState();
+  s.extras.push({id:Date.now(),week:weekKey(),listIndex:i,amount:amount});
+  s.history.push({id:Date.now(),week:weekKey(),listIndex:i,type:"extra",amount:amount,label:"Extra Reward"});
+  saveRewardState(s);E("extraKeys").value="1";renderKeys()
+}
+function redeemReward(cost,label){
+  var st=keyStats();
+  var choices="";
+  for(var i=0;i<3;i++)choices+=i+" = "+cfg.lists[i]+" ("+st.counts[i]+" 🔑)\n";
+  var idx=Number(prompt("Choose who is redeeming:\n"+choices,"1"));
+  if(isNaN(idx)||idx<0||idx>2)return;
+  if(st.counts[idx]<cost)return alert(cfg.lists[idx]+" only has "+st.counts[idx]+" 🔑");
+
+  if(!confirm(cfg.lists[idx]+" redeem "+label+" for "+cost+" 🔑?\nAfter redemption, the key balance will reset to 0."))return;
+
+  var s=rewardState(),wk=weekKey(),tasks=rawTaskKeys(),extras=rawExtraKeys();
+  if(!s.resets[wk])s.resets[wk]={};
+  s.resets[wk][idx]=tasks[idx]+extras[idx];
+  s.history.push({id:Date.now(),week:wk,listIndex:idx,type:"redeem",amount:cost,label:label});
+  saveRewardState(s);renderKeys();
+  alert("Redeemed: "+label+"\n"+cfg.lists[idx]+" is now reset to 0 🔑")
+}
+function renderSettlement(){
+  var st=keyStats(),s=rewardState(),wk=weekKey(),o='<div class="settle-row"><b>Available total</b><b>'+st.total+' 🔑</b></div>',i;
+  for(i=0;i<3;i++)o+='<div class="settle-row"><span>'+esc(cfg.lists[i])+'</span><b>'+st.counts[i]+' 🔑</b></div>';
+  var h=s.history.filter(function(x){return x.week==wk}).slice(-8).reverse();
+  if(h.length){
+    o+='<div class="meta" style="margin-top:10px"><b>This week</b></div>';
+    h.forEach(function(x){
+      var sign=x.type=="extra"?"+":"";
+      o+='<div class="settle-row"><span>'+esc(cfg.lists[x.listIndex])+' · '+esc(x.label)+'</span><b>'+sign+x.amount+' 🔑</b></div>'
+    })
+  }
+  o+='<div class="meta" style="margin-top:8px">Completed To-do = 1 key. Extra Reward can add keys manually. Redeeming a reward resets that member’s available balance to 0.</div>';
+  E("settlement").innerHTML=o;
+}
+function toggleSettlement(){var x=E("settlement");x.className=x.className.indexOf("show")>=0?"settlement":"settlement show"}
+function renderTodos(){
+  var a=todos(),o="";
+  cfg.lists.forEach(function(n,i){
+    o+='<div class="card"><div class="chead"><div><h2>'+esc(n)+'</h2><div class="meta">'+(i?"All incomplete":"This week")+'</div></div><button class="plus" onclick="openTodo('+i+')">+</button></div>';
+    var z=a.filter(function(x){return +(x.listIndex||0)==i});
+    z.forEach(function(x){
+      var earned=(x.done&&x.doneAt&&weekKey(x.doneAt)==weekKey())?' · 🔑 earned':'';
+      o+='<div class="item"><button class="check '+(x.done?"done":"")+'" onclick="toggleTodo('+x.id+')">'+(x.done?"✓":"")+'</button><div class="ibody"><div class="ititle '+(x.done?"done":"")+'">'+esc(x.text||x.title)+'</div><div class="meta">'+(x.due?"Due "+pd(x.due).toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"}):"No due date")+earned+'</div></div><button class="del" onclick="delTodo('+x.id+')">×</button></div>';
+    });
+    if(!z.length)o+='<div class="empty">No tasks</div>';
+    o+='</div>';
+  });
+  E("todos").innerHTML=o;
+  renderKeys();
+}
+function openTodo(i){
+  E("tdTitle").value="";E("tdDue").value="";
+  E("tdList").innerHTML=cfg.lists.map(function(n,j){return'<option value="'+j+'" '+(i==j?"selected":"")+'>'+esc(n)+'</option>'}).join("");
+  showM("todoModal")
+}
+function saveTodo(){
+  var t=E("tdTitle").value.trim();if(!t)return;
+  var a=todos();a.push({id:Date.now(),text:t,listIndex:+E("tdList").value,due:E("tdDue").value,done:false,doneAt:null});
+  put("family_todos",a);closeM("todoModal");renderTodos()
+}
+function toggleTodo(id){
+  var a=todos();
+  a.forEach(function(x){
+    if(x.id==id){
+      x.done=!x.done;
+      x.doneAt=x.done?Date.now():null;
+    }
+  });
+  put("family_todos",a);renderTodos()
+}
+function delTodo(id){
+  put("family_todos",todos().filter(function(x){return x.id!=id}));
+  renderTodos()
+}
+
+function mealData(){return get("fd_meal_plan",{Mon:"",Tue:"",Wed:"",Thu:"",Fri:""})}
+function saveMeal(day,value){
+  var m=mealData();m[day]=value;put("fd_meal_plan",m)
+}
+function renderMeal(){
+  var days=[["Mon","Monday"],["Tue","Tuesday"],["Wed","Wednesday"],["Thu","Thursday"],["Fri","Friday"]],m=mealData(),o="";
+  days.forEach(function(d){
+    o+='<div class="meal-day"><h3>'+d[1]+'</h3><textarea placeholder="Lunch / Dinner / notes..." oninput="saveMeal(\''+d[0]+'\',this.value)">'+esc(m[d[0]]||"")+'</textarea></div>'
+  });
+  E("mealGrid").innerHTML=o
+}
+function openSettings(){E("l1").value=cfg.lists[0];E("l2").value=cfg.lists[1];E("l3").value=cfg.lists[2];E("start").value=cfg.startHour;showM("settingsModal")} function saveSettings(){cfg={lists:[E("l1").value||"Family",E("l2").value||"Julie",E("l3").value||"Cynthia"],startHour:+E("start").value};put("fd_settings",cfg);closeM("settingsModal");renderAll()}
+function renderAll(){renderCal();renderTodos();renderMeal()} renderAll();put("fd_last_open",Date.now());
+</script>
+</body></html>
